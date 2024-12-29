@@ -49,7 +49,7 @@ transform_only_input = A.Compose(
     [
         A.Resize(width=IMAGE_RESIZED, height=IMAGE_RESIZED,),
         A.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5], max_pixel_value=255.0,),
-        A.lambda_transform(image=lambda x: (x / 255.0) * 2.0 - 1.0),
+        A.Lambda(image=lambda x: (x / 255.0) * 2.0 - 1.0),
         ToTensorV2(),
     ]
 )
@@ -58,7 +58,7 @@ transform_only_inter = A.Compose(
     [
         A.Resize(width=IMAGE_RESIZED, height=IMAGE_RESIZED),
         A.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5], max_pixel_value=255.0,),
-        A.lambda_transform(image=lambda x: (x / 255.0) * 2.0 - 1.0),
+        A.Lambda(image=lambda x: (x / 255.0) * 2.0 - 1.0),
         ToTensorV2(),
     ]
 )
@@ -67,7 +67,7 @@ transform_only_mask = A.Compose(
     [
         A.Resize(width=IMAGE_RESIZED, height=IMAGE_RESIZED),
         A.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5], max_pixel_value=255.0,),
-        A.lambda_transform(image=lambda x: (x / 255.0) * 2.0 - 1.0),
+        A.Lambda(image=lambda x: (x / 255.0) * 2.0 - 1.0),
         ToTensorV2(),
     ]
 )
@@ -76,8 +76,8 @@ transform_only_mask_binarize = A.Compose(
     [
         A.Resize(width=IMAGE_RESIZED, height=IMAGE_RESIZED),
         A.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5], max_pixel_value=255.0,),
-        A.lambda_transform(image=lambda x: (x / 255.0) * 2.0 - 1.0),
         ThresholdTransform(thr_255=100),
+        A.Lambda(image=lambda x: (x / 255.0) * 2.0 - 1.0),
         ToTensorV2(),
     ]
 )
