@@ -48,7 +48,7 @@ class ThresholdTransform(BasicTransform):
 transform_only_input = A.Compose(
     [
         A.Resize(width=IMAGE_RESIZED, height=IMAGE_RESIZED,),
-        A.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5], max_pixel_value=255.0,),
+        A.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5], max_pixel_value=255.0,, min_pixel_value=0.0),
         A.Lambda(image=lambda x, **kwargs: (x / 255.0) * 2.0 - 1.0),  # Accept additional kwargs
         ToTensorV2(),
     ]
@@ -57,7 +57,7 @@ transform_only_input = A.Compose(
 transform_only_inter = A.Compose(
     [
         A.Resize(width=IMAGE_RESIZED, height=IMAGE_RESIZED),
-        A.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5], max_pixel_value=255.0,),
+        A.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5], max_pixel_value=255.0,, min_pixel_value=0.0),
         A.Lambda(image=lambda x, **kwargs: (x / 255.0) * 2.0 - 1.0),
         ToTensorV2(),
     ]
@@ -66,7 +66,7 @@ transform_only_inter = A.Compose(
 transform_only_mask = A.Compose(
     [
         A.Resize(width=IMAGE_RESIZED, height=IMAGE_RESIZED),
-        A.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5], max_pixel_value=255.0,),
+        A.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5], max_pixel_value=255.0,, min_pixel_value=0.0),
         A.Lambda(image=lambda x, **kwargs: (x / 255.0) * 2.0 - 1.0),
         ToTensorV2(),
     ]
@@ -75,7 +75,7 @@ transform_only_mask = A.Compose(
 transform_only_mask_binarize = A.Compose(
     [
         A.Resize(width=IMAGE_RESIZED, height=IMAGE_RESIZED),
-        A.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5], max_pixel_value=255.0,),
+        A.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5], max_pixel_value=255.0,, min_pixel_value=0.0),
         ThresholdTransform(thr_255=100),
         A.Lambda(image=lambda x, **kwargs: (x / 255.0) * 2.0 - 1.0),
         ToTensorV2(),
