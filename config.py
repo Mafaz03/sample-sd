@@ -3,6 +3,7 @@ import albumentations as A
 from albumentations.pytorch import ToTensorV2
 import config
 from albumentations.core.transforms_interface import BasicTransform
+from torchvision import transforms
 
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 TRAIN_DIR = "Dataset/Train"
@@ -31,6 +32,13 @@ else:
 ALPHA = 1
 BETA = 0.01
 
+transform = transforms.Compose([
+    transforms.Resize((IMAGE_SIZE,IMAGE_SIZE)), # Resize the input image
+    transforms.ToTensor(), # Convert to torch tensor (scales data into [0,1])
+    transforms.Lambda(lambda t: (t * 2) - 1), # Scale data between [-1, 1] 
+])
+
+
 class ThresholdTransform(BasicTransform):
     def __init__(self, thr_255, always_apply=True, p=1.0):
         super().__init__(always_apply, p)
@@ -48,8 +56,7 @@ class ThresholdTransform(BasicTransform):
 transform_only_input = A.Compose(
     [
         A.Resize(width=IMAGE_RESIZED, height=IMAGE_RESIZED,),
-        A.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5], max_pixel_value=255.0,, min_pixel_value=0.0),
-        A.Lambda(image=lambda x, **kwargs: (x / 255.0) * 2.0 - 1.0),  # Accept additional kwargs
+        A.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5], max_pixel_value=255.0),
         ToTensorV2(),
     ]
 )
@@ -57,8 +64,7 @@ transform_only_input = A.Compose(
 transform_only_inter = A.Compose(
     [
         A.Resize(width=IMAGE_RESIZED, height=IMAGE_RESIZED),
-        A.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5], max_pixel_value=255.0,, min_pixel_value=0.0),
-        A.Lambda(image=lambda x, **kwargs: (x / 255.0) * 2.0 - 1.0),
+        A.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5], max_pixel_value=255.0),
         ToTensorV2(),
     ]
 )
@@ -66,8 +72,7 @@ transform_only_inter = A.Compose(
 transform_only_mask = A.Compose(
     [
         A.Resize(width=IMAGE_RESIZED, height=IMAGE_RESIZED),
-        A.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5], max_pixel_value=255.0,, min_pixel_value=0.0),
-        A.Lambda(image=lambda x, **kwargs: (x / 255.0) * 2.0 - 1.0),
+        A.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5], max_pixel_value=255.0),
         ToTensorV2(),
     ]
 )
@@ -75,9 +80,8 @@ transform_only_mask = A.Compose(
 transform_only_mask_binarize = A.Compose(
     [
         A.Resize(width=IMAGE_RESIZED, height=IMAGE_RESIZED),
-        A.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5], max_pixel_value=255.0,, min_pixel_value=0.0),
+        A.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5], max_pixel_value=255.0),
         ThresholdTransform(thr_255=100),
-        A.Lambda(image=lambda x, **kwargs: (x / 255.0) * 2.0 - 1.0),
         ToTensorV2(),
     ]
 )
