@@ -4,6 +4,7 @@ from albumentations.pytorch import ToTensorV2
 import config
 from albumentations.core.transforms_interface import BasicTransform
 from torchvision import transforms
+import numpy as np
 
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 TRAIN_DIR = "Dataset/Train"
@@ -36,6 +37,14 @@ transform = transforms.Compose([
     transforms.Resize((IMAGE_SIZE,IMAGE_SIZE)), # Resize the input image
     transforms.ToTensor(), # Convert to torch tensor (scales data into [0,1])
     transforms.Lambda(lambda t: (t * 2) - 1), # Scale data between [-1, 1] 
+])
+
+reverse_transform = transforms.Compose([
+    transforms.Lambda(lambda t: (t + 1) / 2), # Scale data between [0,1]
+    transforms.Lambda(lambda t: t.permute(1, 2, 0)), # CHW to HWC
+    transforms.Lambda(lambda t: t * 255.), # Scale data between [0.,255.]
+    transforms.Lambda(lambda t: t.cpu().numpy().astype(np.uint8)), # Convert into an uint8 numpy array
+    transforms.ToPILImage(), # Convert to PIL image
 ])
 
 
