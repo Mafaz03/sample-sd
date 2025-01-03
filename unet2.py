@@ -14,6 +14,21 @@ from nn import (
     gamma_embedding
 )
 
+
+from dataclasses import dataclass
+import torch
+
+@dataclass
+class TrainingConfig:
+    image_size = 128  # the generated image resolution
+
+    sample_size=image_size
+    in_channels=3
+    out_channels=3
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    
+config = TrainingConfig()
+
 class SiLU(nn.Module):
     def forward(self, x):
         return x * torch.sigmoid(x)
@@ -551,7 +566,11 @@ class UNet(nn.Module):
             h = torch.cat([h, hs.pop()], dim=1)
             h = module(h, emb)
         h = h.type(x.dtype)
-        return self.out(h)
+
+        return OutputWrapper(self.out(h))
+class OutputWrapper:
+    def __init__(self, output):
+        self.sample = output
 
 if __name__ == '__main__':
     b, c, h, w = 3, 6, 64, 64
@@ -562,8 +581,11 @@ if __name__ == '__main__':
         inner_channel=64,
         out_channel=3,
         res_blocks=2,
-        attn_res=[8]
+        attn_res=[8],
+        device="cpu",
+        config=config
     )
     x = torch.randn((b, c, h, w))
     emb = torch.ones((b, ))
     out = model(x, emb)
+    print(out.sample.shape)
