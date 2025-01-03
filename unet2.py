@@ -1,10 +1,11 @@
 from abc import abstractmethod
 import math
 
+
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-
+import pdb
 from nn import (
     checkpoint,
     zero_module,
@@ -341,7 +342,6 @@ class UNet(nn.Module):
     :param use_new_attention_order: use a different attention pattern for potentially
                                     increased efficiency.
     """
-
     def __init__(
         self,
         image_size,
@@ -350,6 +350,7 @@ class UNet(nn.Module):
         out_channel,
         res_blocks,
         attn_res,
+        config,
         dropout=0,
         channel_mults=(1, 2, 4, 8),
         conv_resample=True,
@@ -361,12 +362,17 @@ class UNet(nn.Module):
         use_scale_shift_norm=True,
         resblock_updown=True,
         use_new_attention_order=False,
+        device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        
     ):
+        
 
         super().__init__()
 
         if num_heads_upsample == -1:
             num_heads_upsample = num_heads
+
+        self.config=config
 
         self.image_size = image_size
         self.in_channel = in_channel
@@ -382,7 +388,7 @@ class UNet(nn.Module):
         self.num_heads = num_heads
         self.num_head_channels = num_head_channels
         self.num_heads_upsample = num_heads_upsample
-
+        self.device = device
         cond_embed_dim = inner_channel * 4
         self.cond_embed = nn.Sequential(
             nn.Linear(inner_channel, cond_embed_dim),
@@ -522,6 +528,7 @@ class UNet(nn.Module):
             zero_module(nn.Conv2d(input_ch, out_channel, 3, padding=1)),
         )
 
+
     def forward(self, x, gammas):
         """
         Apply the model to an input batch.
@@ -530,6 +537,7 @@ class UNet(nn.Module):
         :return: an [N x C x ...] Tensor of outputs.
         """
         hs = []
+        pdb.set_trace()
         gammas = gammas.view(-1, )
         emb = self.cond_embed(gamma_embedding(gammas, self.inner_channel))
 
@@ -545,7 +553,7 @@ class UNet(nn.Module):
         return self.out(h)
 
 if __name__ == '__main__':
-    b, c, h, w = 3, 3, 64, 64
+    b, c, h, w = 3, 6, 64, 64
     timsteps = 100
     model = UNet(
         image_size=h,
@@ -556,8 +564,5 @@ if __name__ == '__main__':
         attn_res=[8]
     )
     x = torch.randn((b, c, h, w))
-    emb = torch.randint(
-                0, 1000, (3,)
-            ).long()
+    emb = torch.ones((b, ))
     out = model(x, emb)
-    print(out.shape)
