@@ -537,7 +537,7 @@ class UNet(nn.Module):
         :return: an [N x C x ...] Tensor of outputs.
         """
         hs = []
-        pdb.set_trace()
+        # pdb.set_trace()
         gammas = gammas.view(-1, )
         emb = self.cond_embed(gamma_embedding(gammas, self.inner_channel))
 
