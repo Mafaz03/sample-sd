@@ -538,6 +538,7 @@ class UNet(nn.Module):
         """
         hs = []
         # pdb.set_trace()
+        gammas = gammas.to(self.device)
         gammas = gammas.view(-1, )
         emb = self.cond_embed(gamma_embedding(gammas, self.inner_channel))
 
